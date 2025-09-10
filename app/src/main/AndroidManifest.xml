@@ -27,6 +27,11 @@
             android:name=".ListActivity"
             android:exported="true" />
 
+        <!-- 聊天界面 -->
+        <activity
+            android:name=".ChatActivity"
+            android:exported="true" />
+
     </application>
 
 </manifest>

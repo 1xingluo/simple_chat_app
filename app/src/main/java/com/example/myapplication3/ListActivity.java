@@ -1,9 +1,9 @@
 package com.example.myapplication3;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -36,11 +36,13 @@ public class ListActivity extends AppCompatActivity {
         adapter = new ContactAdapter(this, contactList);
         listView.setAdapter(adapter);
 
+        // 点击联系人跳转聊天界面
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Contact contact = contactList.get(position);
-            Toast.makeText(ListActivity.this,
-                    "点击了：" + contact.getName() + "\n电话：" + contact.getPhone(),
-                    Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ListActivity.this, ChatActivity.class);
+            intent.putExtra("contact_name", contact.getName()); // 注意这里 key
+            startActivity(intent);
         });
     }
 }
+
