@@ -1,8 +1,6 @@
 package com.example.myapplication3;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,33 +25,22 @@ public class ListActivity extends AppCompatActivity {
         listView = findViewById(R.id.list_view);
         btnBack = findViewById(R.id.btn_back);
 
-        // 返回按钮点击监听
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish(); // 返回登录界面
-            }
-        });
+        // 返回按钮
+        btnBack.setOnClickListener(v -> finish());
 
-        // 模拟联系人数据
-        contactList.add(new Contact("张三", "13800000000"));
-        contactList.add(new Contact("李四", "13900000000"));
-        contactList.add(new Contact("王五", "13700000000"));
+        // 添加联系人数据，使用大图资源
+        contactList.add(new Contact("张三", "13800000000", R.drawable.photo1));
+        contactList.add(new Contact("李四", "13900000000", R.drawable.photo2));
+        contactList.add(new Contact("王五", "13700000000", R.drawable.photo3));
 
-        // 设置适配器
         adapter = new ContactAdapter(this, contactList);
         listView.setAdapter(adapter);
 
-        // 点击每个联系人显示Toast
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Contact contact = contactList.get(position);
-                Toast.makeText(ListActivity.this,
-                        "点击了：" + contact.getName() + "\n电话：" + contact.getPhone(),
-                        Toast.LENGTH_SHORT).show();
-            }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Contact contact = contactList.get(position);
+            Toast.makeText(ListActivity.this,
+                    "点击了：" + contact.getName() + "\n电话：" + contact.getPhone(),
+                    Toast.LENGTH_SHORT).show();
         });
     }
 }
-
