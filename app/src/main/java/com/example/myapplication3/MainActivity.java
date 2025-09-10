@@ -1,5 +1,6 @@
 package com.example.myapplication3;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if (username.equals("admin") && password.equals("123456")) {
                     Toast.makeText(MainActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                    startActivity(intent);
+
                 } else {
                     Toast.makeText(MainActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
                 }
