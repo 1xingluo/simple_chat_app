@@ -3,18 +3,21 @@ package com.example.myapplication3;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ListActivity extends AppCompatActivity {
 
     private ListView listView;
     private Button btnBack;
-    private String[] data = {"A", "B", "C", "D", "E"};
+    private List<Contact> contactList = new ArrayList<>();
+    private ContactAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,26 +27,31 @@ public class ListActivity extends AppCompatActivity {
         listView = findViewById(R.id.list_view);
         btnBack = findViewById(R.id.btn_back);
 
-        // 返回按钮点击事件
+        // 返回按钮点击监听
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish(); // 结束当前 Activity 返回上一个界面
+                finish(); // 返回登录界面
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                data
-        );
+        // 模拟联系人数据
+        contactList.add(new Contact("张三", "13800000000"));
+        contactList.add(new Contact("李四", "13900000000"));
+        contactList.add(new Contact("王五", "13700000000"));
+
+        // 设置适配器
+        adapter = new ContactAdapter(this, contactList);
         listView.setAdapter(adapter);
 
+        // 点击每个联系人显示Toast
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = data[position];
-                Toast.makeText(ListActivity.this, "点击了：" + item, Toast.LENGTH_SHORT).show();
+                Contact contact = contactList.get(position);
+                Toast.makeText(ListActivity.this,
+                        "点击了：" + contact.getName() + "\n电话：" + contact.getPhone(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
