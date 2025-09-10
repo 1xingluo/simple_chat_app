@@ -33,44 +33,34 @@ public class MainActivity extends AppCompatActivity {
         // 设置背景透明度 50%
         bgImage.setAlpha(0.5f);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = etUsername.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
+        btnLogin.setOnClickListener(view -> {
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "请输入用户名和密码", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // 显示覆盖层
-                loadingOverlay.setVisibility(View.VISIBLE);
-
-                // 模拟网络延迟 2 秒
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadingOverlay.setVisibility(View.GONE);
-
-                        if (username.equals("admin") && password.equals("123456")) {
-                            Toast.makeText(MainActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }, 2000);
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(MainActivity.this, "请输入用户名和密码", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // 显示覆盖层
+            loadingOverlay.setVisibility(View.VISIBLE);
+
+            // 模拟网络延迟 2 秒
+            new Handler().postDelayed(() -> {
+                loadingOverlay.setVisibility(View.GONE);
+
+                if (username.equals("admin") && password.equals("123456")) {
+                    Toast.makeText(MainActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+                }
+            }, 2000);
         });
 
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                etUsername.setText("");
-                etPassword.setText("");
-                Toast.makeText(MainActivity.this, "已清空输入内容", Toast.LENGTH_SHORT).show();
-            }
+        btnReset.setOnClickListener(view -> {
+            etUsername.setText("");
+            etPassword.setText("");
+            Toast.makeText(MainActivity.this, "已清空输入内容", Toast.LENGTH_SHORT).show();
         });
     }
 }
-

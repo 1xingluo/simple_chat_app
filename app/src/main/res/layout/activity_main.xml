@@ -13,17 +13,11 @@
         android:scaleType="centerCrop"
         android:src="@drawable/picture2" />
 
-    <!-- 标题 -->
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
+    <!-- 自定义标题栏 -->
+    <com.example.myapplication3.TitleLayout
+        android:id="@+id/custom_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="登录"
-        android:textColor="#D32F2F"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true" />
 
     <!-- 用户名标签 -->
@@ -31,12 +25,12 @@
         android:id="@+id/tv_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:layout_marginStart="20dp"
         android:text="账号："
         android:textColor="#D32F2F"
         android:textSize="24sp"
-        android:layout_below="@id/tv_title"
+        android:layout_below="@id/custom_title"
         android:layout_alignParentStart="true" />
 
     <!-- 用户名输入框 -->
@@ -116,28 +110,28 @@
         android:gravity="center"
         android:visibility="gone">
 
-    <LinearLayout
-        android:layout_width="200dp"
-        android:layout_height="120dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="@android:color/white"
-        android:padding="20dp">
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="120dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@android:color/white"
+            android:padding="20dp">
 
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
 
-        <TextView
-            android:id="@+id/loading_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="正在登录..."
-            android:layout_marginTop="12dp"
-            android:textSize="16sp"
-            android:textColor="#D32F2F"/>
-    </LinearLayout>
-</RelativeLayout>
-
+            <TextView
+                android:id="@+id/loading_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="正在登录..."
+                android:layout_marginTop="12dp"
+                android:textSize="16sp"
+                android:textColor="#D32F2F"/>
+        </LinearLayout>
     </RelativeLayout>
+
+</RelativeLayout>
