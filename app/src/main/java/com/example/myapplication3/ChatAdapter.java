@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -18,6 +17,18 @@ public class ChatAdapter extends BaseAdapter {
     public ChatAdapter(Context context, List<ChatMessage> messageList) {
         this.context = context;
         this.messageList = messageList;
+    }
+
+    // 告诉ListView item有几种类型
+    @Override
+    public int getViewTypeCount() {
+        return 2; // TYPE_RECEIVED 和 TYPE_SENT
+    }
+
+    // 返回每个item的类型
+    @Override
+    public int getItemViewType(int position) {
+        return messageList.get(position).getType();
     }
 
     @Override
@@ -36,37 +47,28 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        LinearLayout layoutMessage;
         TextView tvMessage;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ChatMessage msg = messageList.get(position);
         ViewHolder holder;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_chat_message, parent, false);
+            if (msg.getType() == ChatMessage.TYPE_RECEIVED) {
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_chat_received, parent, false);
+            } else {
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_chat_sent, parent, false);
+            }
             holder = new ViewHolder();
-            holder.layoutMessage = convertView.findViewById(R.id.layout_message);
             holder.tvMessage = convertView.findViewById(R.id.tv_message);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        ChatMessage msg = messageList.get(position);
-
         holder.tvMessage.setText(msg.getContent());
-
-        // 根据消息类型设置背景
-        if (msg.getType() == ChatMessage.TYPE_SENT) {
-            holder.tvMessage.setBackgroundResource(R.drawable.bg_message_sent);
-            holder.layoutMessage.setGravity(android.view.Gravity.END);
-        } else {
-            holder.tvMessage.setBackgroundResource(R.drawable.bg_message_received);
-            holder.layoutMessage.setGravity(android.view.Gravity.START);
-        }
-
         return convertView;
     }
 }

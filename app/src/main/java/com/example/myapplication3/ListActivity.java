@@ -28,7 +28,7 @@ public class ListActivity extends AppCompatActivity {
         // 返回按钮
         btnBack.setOnClickListener(v -> finish());
 
-        // 添加联系人数据，使用大图资源
+        // 添加联系人数据
         contactList.add(new Contact("张三", "13800000000", R.drawable.photo1));
         contactList.add(new Contact("李四", "13900000000", R.drawable.photo2));
         contactList.add(new Contact("王五", "13700000000", R.drawable.photo3));
@@ -36,11 +36,11 @@ public class ListActivity extends AppCompatActivity {
         adapter = new ContactAdapter(this, contactList);
         listView.setAdapter(adapter);
 
-        // 点击联系人跳转聊天界面
+        // 点击联系人跳转聊天界面，并传递联系人名字
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Contact contact = contactList.get(position);
             Intent intent = new Intent(ListActivity.this, ChatActivity.class);
-            intent.putExtra("contact_name", contact.getName()); // 注意这里 key
+            intent.putExtra("name", contact.getName()); // ✅ 传递联系人名字
             startActivity(intent);
         });
     }

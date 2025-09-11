@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- 顶部标题栏 -->
     <LinearLayout
-        android:id="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#D32F2F"
+        android:background="#2196F3"
         android:gravity="center_vertical"
         android:padding="8dp">
 
@@ -18,16 +18,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="返回"
-            android:textColor="#FFFFFF"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+            android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/tv_chat_name"
+            android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="联系人姓名"
+            android:text="聊天"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"/>
@@ -38,35 +38,28 @@
         android:id="@+id/lv_chat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/title_bar"
-        android:layout_above="@id/input_bar"
-        android:dividerHeight="4dp"
-        android:padding="4dp" />
+        android:layout_weight="1"
+        android:divider="@null"
+        android:stackFromBottom="true"/>
 
-    <!-- 输入栏 -->
+    <!-- 输入框和发送按钮 -->
     <LinearLayout
-        android:id="@+id/input_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="#EEEEEE">
+        android:padding="8dp">
 
         <EditText
-            android:id="@+id/et_message"
+            android:id="@+id/et_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="请输入消息"/>
+            android:hint="输入消息..." />
 
         <Button
             android:id="@+id/btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发送"/>
+            android:text="发送" />
     </LinearLayout>
-
-</RelativeLayout>
-
-
+</LinearLayout>
