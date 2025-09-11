@@ -40,6 +40,9 @@
         <activity
             android:name=".AddFriendActivity"
             android:exported="true" />
+        <activity
+            android:name=".FriendListActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

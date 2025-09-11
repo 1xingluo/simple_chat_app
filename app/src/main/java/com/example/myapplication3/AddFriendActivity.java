@@ -1,5 +1,6 @@
 package com.example.myapplication3;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class AddFriendActivity extends AppCompatActivity {
 
     private EditText etUsername;
-    private Button btnSearch, btnAdd;
+    private Button btnSearch, btnAdd, btnFriendList;
     private TextView tvResult;
     private DBHelper dbHelper;
     private int currentUserId;
@@ -29,6 +30,14 @@ public class AddFriendActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btn_add);
         tvResult = findViewById(R.id.tv_result);
 
+        // 新增：查看好友列表按钮
+        btnFriendList = findViewById(R.id.btn_friend_list);
+        btnFriendList.setOnClickListener(v -> {
+            Intent intent = new Intent(this, FriendListActivity.class);
+            intent.putExtra("currentUserId", currentUserId);
+            startActivity(intent);
+        });
+
         btnSearch.setOnClickListener(v -> {
             String username = etUsername.getText().toString().trim();
             int friendId = dbHelper.getUserId(username);
@@ -44,6 +53,10 @@ public class AddFriendActivity extends AppCompatActivity {
                 btnAdd.setOnClickListener(view -> {
                     if (dbHelper.addFriendRequest(friendId, currentUserId)) {
                         Toast.makeText(this, "好友请求已发送", Toast.LENGTH_SHORT).show();
+                        // 发送成功后直接进入好友列表
+                        Intent intent = new Intent(this, FriendListActivity.class);
+                        intent.putExtra("currentUserId", currentUserId);
+                        startActivity(intent);
                         finish();
                     } else {
                         Toast.makeText(this, "请求已存在或已是好友", Toast.LENGTH_SHORT).show();

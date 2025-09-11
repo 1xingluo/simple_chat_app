@@ -75,4 +75,3 @@ public class ContactAdapter extends BaseAdapter {
         return convertView;
     }
 }
-

@@ -38,5 +38,11 @@
         android:background="@android:color/holo_green_dark"
         android:textColor="#fff"
         android:enabled="false"/>
+    <Button
+        android:id="@+id/btn_friend_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查看好友列表"
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>
