@@ -31,7 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/btn_back"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
         android:text="联系人"
         android:textColor="#974B4B"
         android:textSize="20sp"
@@ -44,5 +43,18 @@
         android:layout_height="match_parent"
         android:layout_below="@id/btn_back"
         android:dividerHeight="1dp" />
+
+    <!-- 添加好友按钮 -->
+    <Button
+        android:id="@+id/btn_add_friend"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="+"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:background="@android:color/holo_green_dark"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp" />
 
 </RelativeLayout>

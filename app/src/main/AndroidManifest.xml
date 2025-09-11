@@ -37,6 +37,9 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
+        <activity
+            android:name=".AddFriendActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
