@@ -35,6 +35,15 @@ public class ListActivity extends AppCompatActivity {
 
         adapter = new ContactAdapter(this, contactList);
         listView.setAdapter(adapter);
+        Button btnMe = findViewById(R.id.btn_me);
+
+        btnMe.setOnClickListener(v -> {
+            // 假设当前登录用户名存储在 intent 或 sharedPreference 中
+            String currentUsername = getIntent().getStringExtra("username");
+            Intent intent = new Intent(ListActivity.this, ProfileActivity.class);
+            intent.putExtra("username", currentUsername);
+            startActivity(intent);
+        });
 
         // 点击联系人跳转聊天界面，并传递联系人名字
         listView.setOnItemClickListener((parent, view, position, id) -> {
