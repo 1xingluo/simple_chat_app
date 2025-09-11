@@ -1,25 +1,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 背景图片 -->
+    <!-- 背景 -->
     <ImageView
         android:id="@+id/bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/picture2"/>
+        android:src="@drawable/picture2"
+        android:alpha="0.5"/>
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="注册"
+        android:textSize="24sp"
+        android:textColor="#D32F2F"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"/>
 
     <!-- 用户名输入 -->
     <EditText
         android:id="@+id/et_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入用户名"
-        android:layout_marginTop="100dp"
+        android:layout_below="@id/tv_title"
+        android:layout_marginTop="40dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:hint="请输入用户名"
         android:background="@android:color/white"
         android:padding="12dp"/>
 
@@ -28,34 +40,22 @@
         android:id="@+id/et_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入密码"
-        android:inputType="textPassword"
         android:layout_below="@id/et_username"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:hint="请输入密码"
+        android:inputType="textPassword"
         android:background="@android:color/white"
         android:padding="12dp"/>
 
-    <!-- 登录按钮 -->
-    <Button
-        android:id="@+id/btn_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/et_password"
-        android:layout_marginTop="40dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="登录"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#D32F2F"/>
     <!-- 注册按钮 -->
     <Button
         android:id="@+id/btn_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_login"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/et_password"
+        android:layout_marginTop="40dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:text="注册"
