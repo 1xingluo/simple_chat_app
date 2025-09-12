@@ -9,8 +9,6 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,8 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText etUsername, etPassword;
     private Button btnLogin, btnRegister;
     private ImageView bgImage, ivAvatar;
-    private RelativeLayout loadingOverlay;
     private DBHelper dbHelper;
+    private CommonLayoutView commonLayoutView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,56 +34,50 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
         bgImage = findViewById(R.id.bg);
-        loadingOverlay = findViewById(R.id.loading_overlay);
+        commonLayoutView = findViewById(R.id.common_layout_view);
 
         bgImage.setAlpha(0.5f);
         dbHelper = new DBHelper(this);
 
         // 用户名输入变化时更新头像
         etUsername.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                String username = s.toString().trim();
-                loadAvatar(username);
+                loadAvatar(s.toString().trim());
             }
         });
 
         // 登录按钮
-        btnLogin.setOnClickListener(view -> {
+        btnLogin.setOnClickListener(v -> {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
             if(username.isEmpty() || password.isEmpty()){
-                Toast.makeText(this,"请输入用户名和密码",Toast.LENGTH_SHORT).show();
+                commonLayoutView.showToast("请输入用户名和密码");
                 return;
             }
 
-            loadingOverlay.setVisibility(RelativeLayout.VISIBLE);
+            commonLayoutView.showLoading(true);
 
             if(dbHelper.checkUser(username,password)){
-                Toast.makeText(this,"登录成功",Toast.LENGTH_SHORT).show();
+                commonLayoutView.showToast("登录成功");
                 loadAvatar(username);
 
                 Intent intent = new Intent(MainActivity.this, ListActivity.class);
                 intent.putExtra("username", username);
                 startActivity(intent);
             } else {
-                Toast.makeText(this,"用户名或密码错误",Toast.LENGTH_SHORT).show();
+                commonLayoutView.showToast("用户名或密码错误");
             }
 
-            loadingOverlay.setVisibility(RelativeLayout.GONE);
+            commonLayoutView.showLoading(false);
         });
 
         // 注册按钮
-        btnRegister.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-            startActivity(intent);
+        btnRegister.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RegisterActivity.class));
         });
     }
 
@@ -100,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
             ivAvatar.setImageBitmap(bitmap);
         } else {
-            ivAvatar.setImageResource(R.drawable.photo1); // 默认头像
+            ivAvatar.setImageResource(R.drawable.photo1);
         }
     }
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,11 +20,17 @@ public class ListActivity extends AppCompatActivity {
     private int currentUserId;
     private List<Object> items;
 
+    private CommonLayoutView commonLayoutView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        // 初始化自定义控件
+        commonLayoutView = findViewById(R.id.common_layout_view);
+
+        // 初始化控件
         listView = findViewById(R.id.list_view);
         btnBack = findViewById(R.id.btn_back);
         btnMe = findViewById(R.id.btn_me);
@@ -42,23 +47,27 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onAccept(String username) {
                 int friendId = dbHelper.getUserId(username);
+                commonLayoutView.showLoading(true);
                 if (dbHelper.acceptFriendRequest(currentUserId, friendId)) {
-                    Toast.makeText(ListActivity.this, "已同意好友请求: " + username, Toast.LENGTH_SHORT).show();
+                    commonLayoutView.showToast("已同意好友请求: " + username);
                     loadData();
                 } else {
-                    Toast.makeText(ListActivity.this, "同意失败，请重试", Toast.LENGTH_SHORT).show();
+                    commonLayoutView.showToast("同意失败，请重试");
                 }
+                commonLayoutView.showLoading(false);
             }
 
             @Override
             public void onReject(String username) {
                 int friendId = dbHelper.getUserId(username);
+                commonLayoutView.showLoading(true);
                 if (dbHelper.rejectFriendRequest(currentUserId, friendId)) {
-                    Toast.makeText(ListActivity.this, "已拒绝好友请求: " + username, Toast.LENGTH_SHORT).show();
+                    commonLayoutView.showToast("已拒绝好友请求: " + username);
                     loadData();
                 } else {
-                    Toast.makeText(ListActivity.this, "拒绝失败，请重试", Toast.LENGTH_SHORT).show();
+                    commonLayoutView.showToast("拒绝失败，请重试");
                 }
+                commonLayoutView.showLoading(false);
             }
         });
 
@@ -89,17 +98,18 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        loadData(); // 初始化数据
+        loadData();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadData(); // 页面重新显示时刷新列表
+        loadData();
     }
 
     private void loadData() {
         items.clear();
+        commonLayoutView.showLoading(true);
 
         // 好友请求
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
@@ -111,6 +121,7 @@ public class ListActivity extends AppCompatActivity {
             items.add(new Contact(friendName, "", R.drawable.photo1));
         }
 
-        adapter.notifyDataSetChanged(); // 刷新界面
+        adapter.notifyDataSetChanged();
+        commonLayoutView.showLoading(false);
     }
 }
