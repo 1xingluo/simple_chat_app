@@ -43,6 +43,7 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
+        // 初始化适配器，处理好友请求操作
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
@@ -87,16 +88,8 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            Object obj = items.get(position);
-            if (obj instanceof Contact) {
-                Contact contact = (Contact) obj;
-                Intent intent = new Intent(ListActivity.this, ChatActivity.class);
-                intent.putExtra("name", contact.getName());
-                intent.putExtra("username", currentUsername);
-                startActivity(intent);
-            }
-        });
+        // 删除聊天点击事件
+        // listView.setOnItemClickListener(...) 不再需要
 
         loadData();
     }

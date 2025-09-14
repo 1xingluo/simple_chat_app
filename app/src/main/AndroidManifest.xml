@@ -27,10 +27,6 @@
             android:name=".ListActivity"
             android:exported="true" />
 
-        <!-- 聊天界面 -->
-        <activity
-            android:name=".ChatActivity"
-            android:exported="true" />
         <activity
             android:name=".RegisterActivity"
             android:exported="true" />
