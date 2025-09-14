@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,6 +41,7 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
+        // 初始化好友适配器
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
@@ -91,10 +91,13 @@ public class ListActivity extends AppCompatActivity {
             Object item = items.get(position);
             if (item instanceof Contact) {
                 Contact contact = (Contact) item;
-                int friendId = dbHelper.getUserId(contact.getName()); // 获取好友ID
+                int friendId = dbHelper.getUserId(contact.getName());
+                String friendName = contact.getName();
                 Intent intent = new Intent(ListActivity.this, ChatActivity.class);
-                intent.putExtra("myId", currentUserId);   // 当前用户ID
-                intent.putExtra("friendId", friendId);    // 好友ID
+                intent.putExtra("currentUserId", currentUserId); // 当前用户ID
+                intent.putExtra("currentUsername", currentUsername); // 当前用户名
+                intent.putExtra("friendId", friendId); // 好友ID
+                intent.putExtra("friendName", friendName); // 好友用户名
                 startActivity(intent);
             }
         });
@@ -114,9 +117,7 @@ public class ListActivity extends AppCompatActivity {
 
         // 好友请求
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
-        for (String username : requests) {
-            items.add(username);  // 好友请求保持字符串
-        }
+        items.addAll(requests);  // 保留字符串形式显示请求
 
         // 好友列表
         List<String> friends = dbHelper.getFriends(currentUserId);
