@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class FriendListActivity extends AppCompatActivity {
             @Override
             public void onAccept(String username) {
                 int friendId = dbHelper.getUserId(username);
-                if (dbHelper.acceptFriendRequest(currentUserId, friendId)) {
+                if(dbHelper.acceptFriendRequest(currentUserId, friendId)){
                     Toast.makeText(FriendListActivity.this, "已同意 " + username, Toast.LENGTH_SHORT).show();
-                    loadData(); // 刷新列表
+                    loadData();
                 } else {
                     Toast.makeText(FriendListActivity.this, "同意失败，请重试", Toast.LENGTH_SHORT).show();
                 }
@@ -43,9 +44,9 @@ public class FriendListActivity extends AppCompatActivity {
             @Override
             public void onReject(String username) {
                 int friendId = dbHelper.getUserId(username);
-                if (dbHelper.rejectFriendRequest(currentUserId, friendId)) {
+                if(dbHelper.rejectFriendRequest(currentUserId, friendId)){
                     Toast.makeText(FriendListActivity.this, "已拒绝 " + username, Toast.LENGTH_SHORT).show();
-                    loadData(); // 刷新列表
+                    loadData();
                 } else {
                     Toast.makeText(FriendListActivity.this, "拒绝失败，请重试", Toast.LENGTH_SHORT).show();
                 }
@@ -54,7 +55,13 @@ public class FriendListActivity extends AppCompatActivity {
 
         listView.setAdapter(adapter);
 
-        loadData(); // 初始化数据
+        loadData(); // 初始化加载
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadData(); // 页面显示时刷新
     }
 
     private void loadData() {
@@ -64,20 +71,14 @@ public class FriendListActivity extends AppCompatActivity {
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
         items.addAll(requests);
 
-        // 发出的好友请求
-        List<String> sent = dbHelper.getSentRequests(currentUserId);
-        for (String s : sent) items.add("我发送: " + s);
-
         // 已同意好友
         List<String> friends = dbHelper.getFriends(currentUserId);
-        for (String f : friends) items.add(new Contact(f, "暂无电话"));
+        for(String f : friends){
+            File file = new File(getFilesDir(), f + "_avatar.png");
+            String avatarPath = file.exists() ? file.getAbsolutePath() : null;
+            items.add(new Contact(f, avatarPath));
+        }
 
-        adapter.notifyDataSetChanged(); // 刷新界面
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadData(); // 页面重新显示时刷新数据
+        adapter.notifyDataSetChanged();
     }
 }

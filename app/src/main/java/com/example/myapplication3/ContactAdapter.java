@@ -17,35 +17,27 @@ public class ContactAdapter extends BaseAdapter {
 
     private Context context;
     private List<Contact> contactList;
-    private int avatarSize; // dp 转 px 的头像大小
+    private int avatarSize; // dp 转 px
 
     public ContactAdapter(Context context, List<Contact> contactList) {
         this.context = context;
         this.contactList = contactList;
-        // 设置头像显示大小 72dp
         float scale = context.getResources().getDisplayMetrics().density;
         avatarSize = (int) (72 * scale + 0.5f);
     }
 
     @Override
-    public int getCount() {
-        return contactList.size();
-    }
+    public int getCount() { return contactList.size(); }
 
     @Override
-    public Object getItem(int position) {
-        return contactList.get(position);
-    }
+    public Object getItem(int position) { return contactList.get(position); }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public long getItemId(int position) { return position; }
 
     static class ViewHolder {
         ImageView avatar;
         TextView name;
-        TextView phone;
     }
 
     @Override
@@ -57,7 +49,6 @@ public class ContactAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.avatar = convertView.findViewById(R.id.img_avatar);
             holder.name = convertView.findViewById(R.id.tv_name);
-            holder.phone = convertView.findViewById(R.id.tv_phone);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -65,9 +56,8 @@ public class ContactAdapter extends BaseAdapter {
 
         Contact contact = contactList.get(position);
         holder.name.setText(contact.getName());
-        holder.phone.setText(contact.getPhone());
 
-        // 根据本地文件路径加载头像
+        // 加载头像
         if (contact.hasAvatar()) {
             File file = new File(contact.getAvatarPath());
             Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());

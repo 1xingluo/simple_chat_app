@@ -40,6 +40,7 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
+        // 初始化适配器
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
@@ -66,6 +67,7 @@ public class ListActivity extends AppCompatActivity {
 
         listView.setAdapter(adapter);
 
+        // 按钮点击
         btnBack.setOnClickListener(v -> finish());
 
         btnMe.setOnClickListener(v -> {
@@ -80,6 +82,7 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // 点击好友进入聊天
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Object item = items.get(position);
             if(item instanceof Contact){
@@ -100,22 +103,23 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadData();
+        loadData(); // 页面重新显示时刷新数据
     }
 
-    private void loadData(){
+    /** 加载好友请求和好友列表 */
+    private void loadData() {
         items.clear();
 
         // 好友请求
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
-        items.addAll(requests);
+        items.addAll(requests); // 字符串形式显示请求
 
         // 好友列表
         List<String> friends = dbHelper.getFriends(currentUserId);
         for(String friendName : friends){
             File file = new File(getFilesDir(), friendName + "_avatar.png");
             String avatarPath = file.exists() ? file.getAbsolutePath() : null;
-            items.add(new Contact(friendName, "暂无电话", avatarPath));
+            items.add(new Contact(friendName, avatarPath));
         }
 
         adapter.notifyDataSetChanged();

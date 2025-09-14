@@ -19,6 +19,7 @@ public class FriendListAdapter extends BaseAdapter {
     private Context context;
     private List<Object> items; // Contact 或 String（好友请求）
     private OnFriendRequestActionListener listener;
+    private int avatarSize; // dp -> px
 
     public interface OnFriendRequestActionListener {
         void onAccept(String username);
@@ -29,6 +30,10 @@ public class FriendListAdapter extends BaseAdapter {
         this.context = context;
         this.items = items;
         this.listener = listener;
+
+        // 设置头像显示大小 48dp
+        float scale = context.getResources().getDisplayMetrics().density;
+        avatarSize = (int) (48 * scale + 0.5f);
     }
 
     @Override
@@ -42,8 +47,7 @@ public class FriendListAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        Object obj = items.get(position);
-        return (obj instanceof Contact) ? 0 : 1;
+        return (items.get(position) instanceof Contact) ? 0 : 1;
     }
 
     @Override
@@ -54,24 +58,27 @@ public class FriendListAdapter extends BaseAdapter {
         Object obj = items.get(position);
 
         if (getItemViewType(position) == 0) {
-            // 联系人
+            // 好友
             if (convertView == null) {
                 convertView = LayoutInflater.from(context).inflate(R.layout.list_item_contact, parent, false);
             }
 
             ImageView avatar = convertView.findViewById(R.id.img_avatar);
             TextView name = convertView.findViewById(R.id.tv_name);
-            TextView phone = convertView.findViewById(R.id.tv_phone);
 
             Contact contact = (Contact) obj;
             name.setText(contact.getName());
-            phone.setText(contact.getPhone());
 
             // 加载头像
-            if(contact.hasAvatar()){
+            if (contact.hasAvatar()) {
                 File file = new File(contact.getAvatarPath());
                 Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                avatar.setImageBitmap(bitmap);
+                if (bitmap != null) {
+                    Bitmap scaled = Bitmap.createScaledBitmap(bitmap, avatarSize, avatarSize, true);
+                    avatar.setImageBitmap(scaled);
+                } else {
+                    avatar.setImageResource(R.drawable.photo1);
+                }
             } else {
                 avatar.setImageResource(R.drawable.photo1);
             }
@@ -89,16 +96,19 @@ public class FriendListAdapter extends BaseAdapter {
             String requester = (String) obj;
             tvName.setText("好友请求: " + requester);
 
+            // 移除旧监听器，防止重用问题
             btnAccept.setOnClickListener(null);
             btnReject.setOnClickListener(null);
 
             btnAccept.setOnClickListener(v -> {
                 if (listener != null) listener.onAccept(requester);
             });
+
             btnReject.setOnClickListener(v -> {
                 if (listener != null) listener.onReject(requester);
             });
         }
+
         return convertView;
     }
 }
