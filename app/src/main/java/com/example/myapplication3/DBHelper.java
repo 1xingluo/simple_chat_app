@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,17 +20,20 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // 用户表
         db.execSQL("CREATE TABLE IF NOT EXISTS user (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "username TEXT UNIQUE," +
                 "password TEXT)");
 
+        // 好友表
         db.execSQL("CREATE TABLE IF NOT EXISTS friend (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "user_id INTEGER," +
                 "friend_id INTEGER," +
                 "status INTEGER)");
 
+        // 消息表
         db.execSQL("CREATE TABLE IF NOT EXISTS message (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "from_id INTEGER," +
@@ -84,6 +88,17 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return id;
+    }
+
+    public String getUsername(int userId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT username FROM user WHERE id=?", new String[]{String.valueOf(userId)});
+        String name = "";
+        if(cursor.moveToFirst()){
+            name = cursor.getString(0);
+        }
+        cursor.close();
+        return name;
     }
 
     // ---------------- 好友操作 ----------------
@@ -194,10 +209,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(userId), String.valueOf(friendId),
                         String.valueOf(friendId), String.valueOf(userId)});
         while (cursor.moveToNext()) {
-            int fromId = cursor.getInt(0);
+            int from = cursor.getInt(0);
             String content = cursor.getString(1);
             String time = cursor.getString(2);
-            String msg = (fromId == userId ? "我: " : "对方: ") + content + " (" + time + ")";
+            String msg = (from == userId ? "我: " : "对方: ") + content + " (" + time + ")";
             messages.add(msg);
         }
         cursor.close();
@@ -211,5 +226,37 @@ public class DBHelper extends SQLiteOpenHelper {
         db.update("message", values,
                 "to_id=? AND from_id=? AND status=0",
                 new String[]{String.valueOf(userId), String.valueOf(friendId)});
+    }
+
+    // ---------------- 私聊显示用户名 ----------------
+    public static class MessageItem {
+        public String senderName;
+        public String content;
+        public String timestamp;
+        public MessageItem(String senderName, String content, String timestamp){
+            this.senderName = senderName;
+            this.content = content;
+            this.timestamp = timestamp;
+        }
+    }
+
+    public List<MessageItem> getMessagesWithUsername(int userId, int friendId) {
+        List<MessageItem> messages = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT from_id, content, timestamp FROM message " +
+                        "WHERE (from_id=? AND to_id=?) OR (from_id=? AND to_id=?) " +
+                        "ORDER BY timestamp ASC",
+                new String[]{String.valueOf(userId), String.valueOf(friendId),
+                        String.valueOf(friendId), String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            int from = cursor.getInt(0);
+            String content = cursor.getString(1);
+            String time = cursor.getString(2);
+            String senderName = getUsername(from);
+            messages.add(new MessageItem(senderName, content, time));
+        }
+        cursor.close();
+        return messages;
     }
 }
