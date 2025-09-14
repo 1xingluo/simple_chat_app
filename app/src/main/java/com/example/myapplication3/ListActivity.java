@@ -39,6 +39,7 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
+        // 初始化适配器
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
@@ -61,17 +62,28 @@ public class ListActivity extends AppCompatActivity {
                     Toast.makeText(ListActivity.this, "拒绝失败，请重试", Toast.LENGTH_SHORT).show();
                 }
             }
+        });
 
-            // 新增删除好友
-            public void onDeleteFriend(String friendName) {
-                int friendId = dbHelper.getUserId(friendName);
-                if(dbHelper.deleteFriend(currentUserId, friendId)){
-                    Toast.makeText(ListActivity.this, "已删除好友: " + friendName, Toast.LENGTH_SHORT).show();
-                    loadData();
-                } else {
-                    Toast.makeText(ListActivity.this, "删除失败，请重试", Toast.LENGTH_SHORT).show();
-                }
+        // 设置删除好友回调（Adapter 内部处理）
+        adapter.setOnFriendDeleteListener(friendName -> {
+            int friendId = dbHelper.getUserId(friendName);
+            if(dbHelper.deleteFriend(currentUserId, friendId)){
+                Toast.makeText(ListActivity.this, "已删除好友: " + friendName, Toast.LENGTH_SHORT).show();
+                loadData();
+            } else {
+                Toast.makeText(ListActivity.this, "删除失败，请重试", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // 设置点击好友条目回调
+        adapter.setOnItemClickListener(contact -> {
+            int friendId = dbHelper.getUserId(contact.getName());
+            Intent intent = new Intent(ListActivity.this, ChatActivity.class);
+            intent.putExtra("currentUserId", currentUserId);
+            intent.putExtra("currentUsername", currentUsername);
+            intent.putExtra("friendId", friendId);
+            intent.putExtra("friendName", contact.getName());
+            startActivity(intent);
         });
 
         listView.setAdapter(adapter);
@@ -95,20 +107,7 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 点击好友进入聊天
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            Object item = items.get(position);
-            if(item instanceof Contact){
-                Contact contact = (Contact) item;
-                int friendId = dbHelper.getUserId(contact.getName());
-                Intent intent = new Intent(ListActivity.this, ChatActivity.class);
-                intent.putExtra("currentUserId", currentUserId);
-                intent.putExtra("currentUsername", currentUsername);
-                intent.putExtra("friendId", friendId);
-                intent.putExtra("friendName", contact.getName());
-                startActivity(intent);
-            }
-        });
+        // 注意：不再使用 listView.setOnItemClickListener
 
         loadData();
     }
