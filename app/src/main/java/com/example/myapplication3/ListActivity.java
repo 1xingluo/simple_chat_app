@@ -28,10 +28,8 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        // 初始化自定义控件
         commonLayoutView = findViewById(R.id.common_layout_view);
 
-        // 初始化控件
         listView = findViewById(R.id.list_view);
         btnBack = findViewById(R.id.btn_back);
         btnMe = findViewById(R.id.btn_me);
@@ -44,7 +42,6 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
-        // 初始化适配器，处理好友请求操作
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
@@ -89,14 +86,15 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 👉 新增：点击好友进入聊天
+        // 点击好友进入聊天
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Object item = items.get(position);
             if (item instanceof Contact) {
                 Contact contact = (Contact) item;
+                int friendId = dbHelper.getUserId(contact.getName()); // 获取好友ID
                 Intent intent = new Intent(ListActivity.this, ChatActivity.class);
-                intent.putExtra("currentUserId", currentUserId);
-                intent.putExtra("friendName", contact.getName());
+                intent.putExtra("myId", currentUserId);   // 当前用户ID
+                intent.putExtra("friendId", friendId);    // 好友ID
                 startActivity(intent);
             }
         });
@@ -116,7 +114,9 @@ public class ListActivity extends AppCompatActivity {
 
         // 好友请求
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
-        items.addAll(requests);
+        for (String username : requests) {
+            items.add(username);  // 好友请求保持字符串
+        }
 
         // 好友列表
         List<String> friends = dbHelper.getFriends(currentUserId);
