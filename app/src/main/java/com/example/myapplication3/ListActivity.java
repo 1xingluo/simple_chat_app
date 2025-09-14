@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -88,8 +89,17 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 删除聊天点击事件
-        // listView.setOnItemClickListener(...) 不再需要
+        // 👉 新增：点击好友进入聊天
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Object item = items.get(position);
+            if (item instanceof Contact) {
+                Contact contact = (Contact) item;
+                Intent intent = new Intent(ListActivity.this, ChatActivity.class);
+                intent.putExtra("currentUserId", currentUserId);
+                intent.putExtra("friendName", contact.getName());
+                startActivity(intent);
+            }
+        });
 
         loadData();
     }

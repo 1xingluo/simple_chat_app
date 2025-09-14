@@ -171,4 +171,45 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return friends;
     }
+
+    // ---------------- 消息操作 ----------------
+    public boolean sendMessage(int fromId, int toId, String content) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("from_id", fromId);
+        values.put("to_id", toId);
+        values.put("content", content);
+        values.put("status", 0); // 未读
+        long result = db.insert("message", null, values);
+        return result != -1;
+    }
+
+    public List<String> getMessages(int userId, int friendId) {
+        List<String> messages = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT from_id, content, timestamp FROM message " +
+                        "WHERE (from_id=? AND to_id=?) OR (from_id=? AND to_id=?) " +
+                        "ORDER BY timestamp ASC",
+                new String[]{String.valueOf(userId), String.valueOf(friendId),
+                        String.valueOf(friendId), String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            int fromId = cursor.getInt(0);
+            String content = cursor.getString(1);
+            String time = cursor.getString(2);
+            String msg = (fromId == userId ? "我: " : "对方: ") + content + " (" + time + ")";
+            messages.add(msg);
+        }
+        cursor.close();
+        return messages;
+    }
+
+    public void markMessagesAsRead(int userId, int friendId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", 1);
+        db.update("message", values,
+                "to_id=? AND from_id=? AND status=0",
+                new String[]{String.valueOf(userId), String.valueOf(friendId)});
+    }
 }
