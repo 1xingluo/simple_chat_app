@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,25 +15,23 @@ import java.util.List;
 public class ListActivity extends AppCompatActivity {
 
     private ListView listView;
-    private Button btnBack, btnMe, btnAddFriend;
+    private Button btnBack, btnMe, btnAddFriend, btnGame;
     private FriendListAdapter adapter;
     private DBHelper dbHelper;
     private String currentUsername;
     private int currentUserId;
     private List<Object> items;
 
-    private CommonLayoutView commonLayoutView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        commonLayoutView = findViewById(R.id.common_layout_view);
         listView = findViewById(R.id.list_view);
         btnBack = findViewById(R.id.btn_back);
         btnMe = findViewById(R.id.btn_me);
         btnAddFriend = findViewById(R.id.btn_add_friend);
+        btnGame = findViewById(R.id.btn_game);
 
         dbHelper = new DBHelper(this);
         currentUsername = getIntent().getStringExtra("username");
@@ -40,16 +39,15 @@ public class ListActivity extends AppCompatActivity {
 
         items = new ArrayList<>();
 
-        // 初始化适配器
         adapter = new FriendListAdapter(this, items, new FriendListAdapter.OnFriendRequestActionListener() {
             @Override
             public void onAccept(String username) {
                 int friendId = dbHelper.getUserId(username);
                 if(dbHelper.acceptFriendRequest(currentUserId, friendId)){
-                    commonLayoutView.showToast("已同意好友请求: " + username);
+                    Toast.makeText(ListActivity.this, "已同意好友请求: " + username, Toast.LENGTH_SHORT).show();
                     loadData();
                 } else {
-                    commonLayoutView.showToast("同意失败，请重试");
+                    Toast.makeText(ListActivity.this, "同意失败，请重试", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -57,28 +55,43 @@ public class ListActivity extends AppCompatActivity {
             public void onReject(String username) {
                 int friendId = dbHelper.getUserId(username);
                 if(dbHelper.rejectFriendRequest(currentUserId, friendId)){
-                    commonLayoutView.showToast("已拒绝好友请求: " + username);
+                    Toast.makeText(ListActivity.this, "已拒绝好友请求: " + username, Toast.LENGTH_SHORT).show();
                     loadData();
                 } else {
-                    commonLayoutView.showToast("拒绝失败，请重试");
+                    Toast.makeText(ListActivity.this, "拒绝失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            // 新增删除好友
+            public void onDeleteFriend(String friendName) {
+                int friendId = dbHelper.getUserId(friendName);
+                if(dbHelper.deleteFriend(currentUserId, friendId)){
+                    Toast.makeText(ListActivity.this, "已删除好友: " + friendName, Toast.LENGTH_SHORT).show();
+                    loadData();
+                } else {
+                    Toast.makeText(ListActivity.this, "删除失败，请重试", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         listView.setAdapter(adapter);
 
-        // 按钮点击
+        // 顶部按钮
         btnBack.setOnClickListener(v -> finish());
-
         btnMe.setOnClickListener(v -> {
             Intent intent = new Intent(ListActivity.this, ProfileActivity.class);
             intent.putExtra("username", currentUsername);
             startActivity(intent);
         });
-
         btnAddFriend.setOnClickListener(v -> {
             Intent intent = new Intent(ListActivity.this, AddFriendActivity.class);
             intent.putExtra("currentUserId", currentUserId);
+            startActivity(intent);
+        });
+
+        // 左下角游戏机按钮
+        btnGame.setOnClickListener(v -> {
+            Intent intent = new Intent(ListActivity.this, WhackAMoleActivity.class);
             startActivity(intent);
         });
 
@@ -103,7 +116,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadData(); // 页面重新显示时刷新数据
+        loadData(); // 页面显示时刷新数据
     }
 
     /** 加载好友请求和好友列表 */
@@ -112,7 +125,7 @@ public class ListActivity extends AppCompatActivity {
 
         // 好友请求
         List<String> requests = dbHelper.getFriendRequests(currentUserId);
-        items.addAll(requests); // 字符串形式显示请求
+        items.addAll(requests);
 
         // 好友列表
         List<String> friends = dbHelper.getFriends(currentUserId);

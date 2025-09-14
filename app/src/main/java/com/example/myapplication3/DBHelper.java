@@ -239,6 +239,27 @@ public class DBHelper extends SQLiteOpenHelper {
             this.timestamp = timestamp;
         }
     }
+// ---------------- 好友操作 ----------------
+    /** 删除好友（双向） */
+    public boolean deleteFriend(int userId, int friendId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // 删除 user -> friend
+            int count1 = db.delete("friend",
+                    "user_id=? AND friend_id=? AND status=1",
+                    new String[]{String.valueOf(userId), String.valueOf(friendId)});
+            // 删除 friend -> user
+            int count2 = db.delete("friend",
+                    "user_id=? AND friend_id=? AND status=1",
+                    new String[]{String.valueOf(friendId), String.valueOf(userId)});
+            return count1 > 0 || count2 > 0;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        } finally {
+            db.close();
+        }
+    }
 
     public List<MessageItem> getMessagesWithUsername(int userId, int friendId) {
         List<MessageItem> messages = new ArrayList<>();

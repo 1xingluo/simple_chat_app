@@ -42,6 +42,9 @@
         <activity
             android:name=".ChatActivity"
             android:exported="true" />
+        <activity
+            android:name=".WhackAMoleActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
