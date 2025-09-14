@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 public class ContactAdapter extends BaseAdapter {
@@ -52,7 +53,6 @@ public class ContactAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-            // 修改布局文件名为 list_item_contact
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_contact, parent, false);
             holder = new ViewHolder();
             holder.avatar = convertView.findViewById(R.id.img_avatar);
@@ -67,10 +67,19 @@ public class ContactAdapter extends BaseAdapter {
         holder.name.setText(contact.getName());
         holder.phone.setText(contact.getPhone());
 
-        // 自动缩放头像图片
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), contact.getAvatarResId());
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, avatarSize, avatarSize, true);
-        holder.avatar.setImageBitmap(scaledBitmap);
+        // 根据本地文件路径加载头像
+        if (contact.hasAvatar()) {
+            File file = new File(contact.getAvatarPath());
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+            if (bitmap != null) {
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, avatarSize, avatarSize, true);
+                holder.avatar.setImageBitmap(scaledBitmap);
+            } else {
+                holder.avatar.setImageResource(R.drawable.photo1);
+            }
+        } else {
+            holder.avatar.setImageResource(R.drawable.photo1);
+        }
 
         return convertView;
     }
