@@ -16,13 +16,14 @@ public class WhackAMoleActivity extends AppCompatActivity {
 
     private GridLayout gridLayout;
     private TextView tvScore;
-    private Button btnRestart;
+    private Button btnStart, btnPause;
 
     private Button[][] buttons = new Button[3][3];
     private int score = 0;
     private int moleRow = -1, moleCol = -1;
     private boolean moleVisible = false; // 当前地鼠是否存在
     private boolean gameOver = false;    // 游戏是否结束
+    private boolean paused = false;      // 是否暂停
 
     private Handler handler = new Handler();
     private Random random = new Random();
@@ -39,12 +40,17 @@ public class WhackAMoleActivity extends AppCompatActivity {
 
         gridLayout = findViewById(R.id.grid_layout);
         tvScore = findViewById(R.id.tv_score);
-        btnRestart = findViewById(R.id.btn_restart);
+        btnStart = findViewById(R.id.btn_start);
+        btnPause = findViewById(R.id.btn_pause);
 
-        btnRestart.setOnClickListener(v -> startGame());
+        btnStart.setOnClickListener(v -> {
+            clearAllMoles(); // 强制清空一次
+            startGame();
+        });
+
+        btnPause.setOnClickListener(v -> togglePause());
 
         initBoard();
-        startGame();
     }
 
     private void initBoard() {
@@ -75,7 +81,20 @@ public class WhackAMoleActivity extends AppCompatActivity {
         }
     }
 
+    private void clearAllMoles() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+                buttons[i][j].setBackgroundColor(0xFFAAAAAA);
+            }
+        }
+        moleRow = -1;
+        moleCol = -1;
+        moleVisible = false;
+    }
+
     private void startGame() {
+        clearAllMoles();
         score = 0;
         tvScore.setText("分数: 0");
         moleInterval = 1000;
@@ -83,6 +102,8 @@ public class WhackAMoleActivity extends AppCompatActivity {
         moleRow = -1;
         moleCol = -1;
         gameOver = false;
+        paused = false;
+        btnPause.setText("暂停");
 
         if (moleRunnable != null) handler.removeCallbacks(moleRunnable);
         if (speedRunnable != null) handler.removeCallbacks(speedRunnable);
@@ -90,8 +111,8 @@ public class WhackAMoleActivity extends AppCompatActivity {
         moleRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!gameOver) showMole();
-                if (!gameOver) handler.postDelayed(this, moleInterval);
+                if (!gameOver && !paused) showMole();
+                if (!gameOver && !paused) handler.postDelayed(this, moleInterval);
             }
         };
         handler.post(moleRunnable);
@@ -99,11 +120,28 @@ public class WhackAMoleActivity extends AppCompatActivity {
         speedRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!gameOver && moleInterval > 200) moleInterval -= 100;
-                if (!gameOver) handler.postDelayed(this, speedIncreaseInterval);
+                if (!gameOver && !paused && moleInterval > 200) moleInterval -= 100;
+                if (!gameOver && !paused) handler.postDelayed(this, speedIncreaseInterval);
             }
         };
         handler.postDelayed(speedRunnable, speedIncreaseInterval);
+    }
+
+    private void togglePause() {
+        if (gameOver) return;
+
+        paused = !paused;
+        if (paused) {
+            // 暂停：移除所有回调
+            handler.removeCallbacks(moleRunnable);
+            handler.removeCallbacks(speedRunnable);
+            btnPause.setText("继续");
+        } else {
+            // 继续：重新开启任务
+            btnPause.setText("暂停");
+            handler.post(moleRunnable);
+            handler.postDelayed(speedRunnable, speedIncreaseInterval);
+        }
     }
 
     private void showMole() {
@@ -125,7 +163,7 @@ public class WhackAMoleActivity extends AppCompatActivity {
     }
 
     private void clickCell(int row, int col) {
-        if (gameOver) return;
+        if (gameOver || paused) return;
 
         if (row == moleRow && col == moleCol) {
             score++;
@@ -147,15 +185,15 @@ public class WhackAMoleActivity extends AppCompatActivity {
         if (moleRunnable != null) handler.removeCallbacks(moleRunnable);
         if (speedRunnable != null) handler.removeCallbacks(speedRunnable);
 
-        if (moleRow >= 0 && moleCol >= 0) {
-            buttons[moleRow][moleCol].setText("");
-            buttons[moleRow][moleCol].setBackgroundColor(0xFFAAAAAA);
-        }
+        clearAllMoles();
 
         new AlertDialog.Builder(this)
                 .setTitle("游戏结束")
                 .setMessage("原因: " + reason + "\n你的最终成绩: " + score)
-                .setPositiveButton("重新开始", (dialog, which) -> startGame())
+                .setPositiveButton("开始游戏", (dialog, which) -> {
+                    clearAllMoles();
+                    startGame();
+                })
                 .setNegativeButton("退出", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
