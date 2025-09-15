@@ -1,15 +1,15 @@
 package com.example.myapplication3;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Random;
 
 public class WhackAMoleActivity extends AppCompatActivity {
@@ -24,25 +24,39 @@ public class WhackAMoleActivity extends AppCompatActivity {
     private boolean moleVisible = false; // 当前地鼠是否存在
     private boolean gameOver = false;    // 游戏是否结束
     private boolean paused = false;      // 是否暂停
+    private int highScore = 0;           // 用户的最高分数
 
     private Handler handler = new Handler();
     private Random random = new Random();
     private Runnable moleRunnable;
     private Runnable speedRunnable;
 
-    private long moleInterval = 1000; // 初始刷新间隔
-    private long speedIncreaseInterval = 10000; // 每10秒加快
+    private long moleInterval = 1000; // 初始刷新间隔（1000毫秒）
+    private long speedIncreaseInterval = 5000; // 每5秒加快
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_whack_a_mole);
 
+        // 获取当前用户的唯一 ID
+        String userId = getUserIdFromPreferences(); // 假设从登录系统中获取
+
+        // 根据 userId 动态生成独立的 SharedPreferences 文件
+        sharedPreferences = getSharedPreferences(userId + "_WhackAMolePreferences", MODE_PRIVATE);
+
+        // 获取保存的最高分数
+        highScore = sharedPreferences.getInt("highScore", 0);
+
+        // 获取界面元素
         gridLayout = findViewById(R.id.grid_layout);
         tvScore = findViewById(R.id.tv_score);
         btnStart = findViewById(R.id.btn_start);
         btnPause = findViewById(R.id.btn_pause);
 
+        // 设置按钮点击事件
         btnStart.setOnClickListener(v -> {
             clearAllMoles(); // 强制清空一次
             startGame();
@@ -53,6 +67,14 @@ public class WhackAMoleActivity extends AppCompatActivity {
         initBoard();
     }
 
+    // 获取当前登录的用户ID
+    private String getUserIdFromPreferences() {
+        // 假设用户已经登录，ID从登录系统或 SharedPreferences 获取
+        // 这里用一个假设的用户ID（你可以根据实际情况更改）
+        return "user123"; // 根据实际情况替换
+    }
+
+    // 初始化网格
     private void initBoard() {
         gridLayout.removeAllViews();
         int numRows = 3, numCols = 3;
@@ -81,6 +103,7 @@ public class WhackAMoleActivity extends AppCompatActivity {
         }
     }
 
+    // 清除所有地鼠
     private void clearAllMoles() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -93,11 +116,11 @@ public class WhackAMoleActivity extends AppCompatActivity {
         moleVisible = false;
     }
 
+    // 开始游戏
     private void startGame() {
         clearAllMoles();
         score = 0;
         tvScore.setText("分数: 0");
-        moleInterval = 1000;
         moleVisible = false;
         moleRow = -1;
         moleCol = -1;
@@ -120,13 +143,14 @@ public class WhackAMoleActivity extends AppCompatActivity {
         speedRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!gameOver && !paused && moleInterval > 200) moleInterval -= 100;
+                if (!gameOver && !paused && moleInterval > 100) moleInterval -= 50; // 更快速递减
                 if (!gameOver && !paused) handler.postDelayed(this, speedIncreaseInterval);
             }
         };
         handler.postDelayed(speedRunnable, speedIncreaseInterval);
     }
 
+    // 暂停或继续游戏
     private void togglePause() {
         if (gameOver) return;
 
@@ -144,6 +168,7 @@ public class WhackAMoleActivity extends AppCompatActivity {
         }
     }
 
+    // 显示地鼠
     private void showMole() {
         if (moleVisible) {
             endGame("漏点");
@@ -162,6 +187,7 @@ public class WhackAMoleActivity extends AppCompatActivity {
         moleVisible = true;
     }
 
+    // 点击格子
     private void clickCell(int row, int col) {
         if (gameOver || paused) return;
 
@@ -178,6 +204,7 @@ public class WhackAMoleActivity extends AppCompatActivity {
         }
     }
 
+    // 游戏结束
     private void endGame(String reason) {
         if (gameOver) return; // 防止重复调用
         gameOver = true;
@@ -187,9 +214,18 @@ public class WhackAMoleActivity extends AppCompatActivity {
 
         clearAllMoles();
 
+        // 更新最高分并保存到 SharedPreferences
+        if (score > highScore) {
+            highScore = score;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("highScore", highScore);  // 保存最高分数
+            editor.apply();  // 提交更改
+        }
+
+        // 移除最高分显示，仅显示当前得分
         new AlertDialog.Builder(this)
                 .setTitle("游戏结束")
-                .setMessage("原因: " + reason + "\n你的最终成绩: " + score)
+                .setMessage("原因: " + reason + "\n你的最终成绩: " + score) // 删除了最高分数的显示
                 .setPositiveButton("开始游戏", (dialog, which) -> {
                     clearAllMoles();
                     startGame();
@@ -199,10 +235,14 @@ public class WhackAMoleActivity extends AppCompatActivity {
                 .show();
     }
 
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (moleRunnable != null) handler.removeCallbacks(moleRunnable);
-        if (speedRunnable != null) handler.removeCallbacks(speedRunnable);
+    protected void onPause() {
+        super.onPause();
+        if (!gameOver) {
+            paused = true;
+            handler.removeCallbacks(moleRunnable);
+            handler.removeCallbacks(speedRunnable);
+        }
     }
 }
