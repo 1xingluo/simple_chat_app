@@ -45,6 +45,9 @@
         <activity
             android:name=".WhackAMoleActivity"
             android:exported="true" />
+        <activity
+            android:name=".CanvasActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -15,7 +15,7 @@ import java.util.List;
 public class ListActivity extends AppCompatActivity {
 
     private ListView listView;
-    private Button btnBack, btnMe, btnAddFriend, btnGame;
+    private Button btnBack, btnMe, btnAddFriend, btnGame, btnCanvas;
     private FriendListAdapter adapter;
     private DBHelper dbHelper;
     private String currentUsername;
@@ -44,7 +44,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onAccept(String username) {
                 int friendId = dbHelper.getUserId(username);
-                if(dbHelper.acceptFriendRequest(currentUserId, friendId)){
+                if (dbHelper.acceptFriendRequest(currentUserId, friendId)) {
                     Toast.makeText(ListActivity.this, "已同意好友请求: " + username, Toast.LENGTH_SHORT).show();
                     loadData();
                 } else {
@@ -55,7 +55,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onReject(String username) {
                 int friendId = dbHelper.getUserId(username);
-                if(dbHelper.rejectFriendRequest(currentUserId, friendId)){
+                if (dbHelper.rejectFriendRequest(currentUserId, friendId)) {
                     Toast.makeText(ListActivity.this, "已拒绝好友请求: " + username, Toast.LENGTH_SHORT).show();
                     loadData();
                 } else {
@@ -64,10 +64,10 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        // 设置删除好友回调（Adapter 内部处理）
+        // 删除好友回调
         adapter.setOnFriendDeleteListener(friendName -> {
             int friendId = dbHelper.getUserId(friendName);
-            if(dbHelper.deleteFriend(currentUserId, friendId)){
+            if (dbHelper.deleteFriend(currentUserId, friendId)) {
                 Toast.makeText(ListActivity.this, "已删除好友: " + friendName, Toast.LENGTH_SHORT).show();
                 loadData();
             } else {
@@ -75,7 +75,7 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        // 设置点击好友条目回调
+        // 点击好友进入聊天
         adapter.setOnItemClickListener(contact -> {
             int friendId = dbHelper.getUserId(contact.getName());
             Intent intent = new Intent(ListActivity.this, ChatActivity.class);
@@ -100,14 +100,10 @@ public class ListActivity extends AppCompatActivity {
             intent.putExtra("currentUserId", currentUserId);
             startActivity(intent);
         });
-
-        // 左下角游戏机按钮
         btnGame.setOnClickListener(v -> {
             Intent intent = new Intent(ListActivity.this, WhackAMoleActivity.class);
             startActivity(intent);
         });
-
-        // 注意：不再使用 listView.setOnItemClickListener
 
         loadData();
     }
@@ -128,7 +124,7 @@ public class ListActivity extends AppCompatActivity {
 
         // 好友列表
         List<String> friends = dbHelper.getFriends(currentUserId);
-        for(String friendName : friends){
+        for (String friendName : friends) {
             File file = new File(getFilesDir(), friendName + "_avatar.png");
             String avatarPath = file.exists() ? file.getAbsolutePath() : null;
             items.add(new Contact(friendName, avatarPath));

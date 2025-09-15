@@ -11,6 +11,8 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -23,10 +25,10 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword;
-    private Button btnLogin, btnRegister;
+    private Button btnLogin, btnRegister, btnCanvas;
     private ImageView ivAvatar;
+    private ProgressBar progressBar;  // Add ProgressBar
     private DBHelper dbHelper;
-    private CommonLayoutView commonLayoutView;
 
     // ActivityResultLauncher 用于选择图片
     private ActivityResultLauncher<Intent> pickImageLauncher;
@@ -41,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
-        commonLayoutView = findViewById(R.id.common_layout_view);
+        btnCanvas = findViewById(R.id.btn_canvas);
+        progressBar = findViewById(R.id.progressBar);  // Initialize ProgressBar
 
         dbHelper = new DBHelper(this);
 
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         // 点击头像换头像
         ivAvatar.setOnClickListener(v -> {
             if(etUsername.getText().toString().trim().isEmpty()){
-                commonLayoutView.showToast("请先输入用户名");
+                Toast.makeText(MainActivity.this, "请先输入用户名", Toast.LENGTH_SHORT).show();
                 return;
             }
             // 打开图库选择图片
@@ -85,29 +88,36 @@ public class MainActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             if(username.isEmpty() || password.isEmpty()){
-                commonLayoutView.showToast("请输入用户名和密码");
+                Toast.makeText(MainActivity.this, "请输入用户名和密码", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            commonLayoutView.showLoading(true);
+            progressBar.setVisibility(ProgressBar.VISIBLE);  // Show loading indicator
+
             etUsername.postDelayed(() -> {
                 if(dbHelper.checkUser(username, password)){
-                    commonLayoutView.showToast("登录成功");
+                    Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                     loadAvatar(username);
 
                     Intent intent = new Intent(MainActivity.this, ListActivity.class);
                     intent.putExtra("username", username);
                     startActivity(intent);
                 } else {
-                    commonLayoutView.showToast("用户名或密码错误");
+                    Toast.makeText(MainActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
                 }
-                commonLayoutView.showLoading(false);
-            }, 1000);
+                progressBar.setVisibility(ProgressBar.GONE);  // Hide loading indicator
+            }, 2000);
         });
 
         // 注册按钮点击
         btnRegister.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
+        // 画布按钮点击事件
+        btnCanvas.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CanvasActivity.class);  // CanvasActivity
             startActivity(intent);
         });
     }
@@ -142,10 +152,10 @@ public class MainActivity extends AppCompatActivity {
             fos.close();
 
             ivAvatar.setImageBitmap(bitmap);
-            commonLayoutView.showToast("头像已保存");
+            Toast.makeText(MainActivity.this, "头像已保存", Toast.LENGTH_SHORT).show();
         } catch (Exception e){
             e.printStackTrace();
-            commonLayoutView.showToast("头像保存失败");
+            Toast.makeText(MainActivity.this, "头像保存失败", Toast.LENGTH_SHORT).show();
         }
     }
 }

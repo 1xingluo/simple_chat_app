@@ -72,10 +72,5 @@
         android:contentDescription="游戏按钮" />
 
 
-    <!-- 自定义控件，覆盖在最上层 -->
-    <com.example.myapplication3.CommonLayoutView
-        android:id="@+id/common_layout_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </RelativeLayout>

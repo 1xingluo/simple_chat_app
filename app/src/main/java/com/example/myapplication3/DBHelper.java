@@ -227,6 +227,24 @@ public class DBHelper extends SQLiteOpenHelper {
                 "to_id=? AND from_id=? AND status=0",
                 new String[]{String.valueOf(userId), String.valueOf(friendId)});
     }
+    public List<String> getAllUsernames() {
+        List<String> usernames = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT username FROM user", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                    usernames.add(name);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+        return usernames;
+    }
 
     // ---------------- 私聊显示用户名 ----------------
     public static class MessageItem {
